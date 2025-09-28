@@ -26,7 +26,7 @@ export const test = base.extend<ApiFixtures>({
     
     // Create authenticated API request context using playwright.request
     const api = await playwright.request.newContext({
-      baseURL: 'https://api.spotify.com/v1',  // Set Spotify API base URL
+      baseURL: 'https://api.spotify.com/v1/',  // Set Spotify API base URL
       extraHTTPHeaders: { Authorization: `Bearer ${token}` },  // Add auth header
     });
     
