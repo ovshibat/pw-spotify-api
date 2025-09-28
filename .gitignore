@@ -7,3 +7,7 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 .env
+# Local env files
+.env
+.env.*
+*.env
