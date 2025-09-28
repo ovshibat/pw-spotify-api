@@ -5,11 +5,11 @@ const REQUIRED_KEYS = [
 ] as const;
 
 test.describe('Albums – GET /albums/{id}', () => {
-  test('returns album details for a valid album id', async ({ api }) => {
+test('returns album details for a valid album id', async ({ api }) => {
     const albumId = process.env.ALBUM_ID;
     expect(albumId, 'ALBUM_ID must be provided in .env').toBeTruthy();
 
-    const res = await api.get(`/albums/${albumId}`);
+    const res = await api.get(`albums/${albumId}`);
     expect(res.status(), 'HTTP status').toBe(200);
 
     const json = await res.json();
