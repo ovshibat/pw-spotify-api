@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures';
 
 test('get current user profile', async ({ api }) => {
-  const res = await api.get('/me');
+  const res = await api.get('me');
   expect(res.status()).toBe(200);
   const json = await res.json();
   expect(json).toHaveProperty('id');
