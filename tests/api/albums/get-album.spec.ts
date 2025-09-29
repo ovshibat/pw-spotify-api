@@ -50,6 +50,7 @@ test('returns album details for a valid album id', async ({ api }) => {
       const res = await api.get(`albums/${badId}`);
       expect(res.status(), `Expected 400 for id: ${badId}`).toBe(400);
 
+      
       const json = await res.json();
       expect(json).toHaveProperty('error');
       expect(json.error.status).toBe(400);
