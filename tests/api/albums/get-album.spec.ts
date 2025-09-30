@@ -17,7 +17,7 @@ type InvalidAlbumCase = {
   id: string;
   label: string;
   expectedStatus: number;
-  expectedMessage: String | RegExp;
+  expectedMessage: string | RegExp; // changed from `String | RegExp`
 }
 
 const invalidAlbumCases: InvalidAlbumCase[] = [
@@ -90,6 +90,31 @@ test.describe('Albums – GET /albums/{id}', () => {
     expect(json.external_urls?.spotify).toMatch(/^https:\/\/open\.spotify\.com\/album\//);
     expect(json.href).toMatch(/^https:\/\/api\.spotify\.com\/v1\/albums\//);
   });
+
+  test.describe('Album - GET /albums/{id}', () => {
+    test('returns all the required fields with valid values', async ({ api }) => {
+      const albumId = process.env.ALBUM_ID;
+      expect(albumId, 'ALBUM_ID must be set in .env').toBeTruthy();
+
+      const res = await api.get(`albums/${albumId}`);
+      expect(res.status(), 'HTTP status').toBe(200);
+
+      const json = await res.json();
+
+      //required fields existence
+      expect(json).toHaveProperty('album_type');
+      expect(json).toHaveProperty('total_tracks');
+      expect(json).toHaveProperty('id');
+      expect(json).toHaveProperty('name');
+
+      // allowed values for album_type
+      const allowedAlbumTypes = ['album', 'single', 'compilation'];
+      expect(allowedAlbumTypes).toContain(json.album_type);
+
+      // allowed 
+
+    })
+  })
 
   test.describe('invalid inputs', () => {
     for (const { label, id, expectedStatus, expectedMessage } of invalidAlbumCases) {
