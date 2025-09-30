@@ -61,7 +61,7 @@ const invalidAlbumCases: InvalidAlbumCase[] = [
 ];
 
 test.describe('Albums – GET /albums/{id}', () => {
-test('returns album details for a valid album id', async ({ api }) => {
+  test('returns album details for a valid album id', async ({ api }) => {
     const albumId = process.env.ALBUM_ID;
     expect(albumId, 'ALBUM_ID must be provided in .env').toBeTruthy();
 
@@ -91,23 +91,23 @@ test('returns album details for a valid album id', async ({ api }) => {
     expect(json.href).toMatch(/^https:\/\/api\.spotify\.com\/v1\/albums\//);
   });
 
-  test.describe('Albums – GET /albums/{id} – invalid inputs', () => {
-  for (const { label, id, expectedStatus, expectedMessage } of invalidAlbumCases) {
-    test(`returns ${expectedStatus} when album id is ${label}`, async ({ api }) => {
-      const res = await api.get(`albums/${id}`);
-      expect(res.status(), 'HTTP status').toBe(expectedStatus);
+  test.describe('invalid inputs', () => {
+    for (const { label, id, expectedStatus, expectedMessage } of invalidAlbumCases) {
+      test(`returns ${expectedStatus} when album id is ${label}`, async ({ api }) => {
+        const res = await api.get(`albums/${id}`);
+        expect(res.status(), 'HTTP status').toBe(expectedStatus);
 
-      const body = await res.json();
-      expect(body).toHaveProperty('error');
-      expect(body.error.status, 'error.status').toBe(expectedStatus);
+        const body = await res.json();
+        expect(body).toHaveProperty('error');
+        expect(body.error.status, 'error.status').toBe(expectedStatus);
 
-      if (typeof expectedMessage === 'string') {
-        expect(body.error.message, 'error.message').toBe(expectedMessage);
-      } else {
-        expect(body.error.message, 'error.message').toMatch(expectedMessage);
-      }
-    });
-  }
-});
+        if (typeof expectedMessage === 'string') {
+          expect(body.error.message, 'error.message').toBe(expectedMessage);
+        } else {
+          expect(body.error.message, 'error.message').toMatch(expectedMessage);
+        }
+      });
+    }
+  });
 
 });
