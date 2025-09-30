@@ -9,8 +9,55 @@ const invalidAlbumIds = [
   'abc123',                             // too short
   '12345678901234567890123',            // too long (23 chars)
   'abc$%^&*',                           // illegal characters
-  ' https://open.spotify.com/album/1ATL5GLyefJaxhQzSPVrLX', // full URL
+  'https://open.spotify.com/album/1ATL5GLyefJaxhQzSPVrLX', // full URL
   '1ATL5GLyefJaxhQzSPVrLX ',            // valid ID but with whitespace
+];
+
+type InvalidAlbumCase = {
+  id: string;
+  label: string;
+  expectedStatus: number;
+  expectedMessage: String | RegExp;
+}
+
+const invalidAlbumCases: InvalidAlbumCase[] = [
+  {
+    label: 'empty string',
+    id: '',
+    expectedStatus: 400,
+    expectedMessage: /Missing required field: ids/i,
+  },
+  // Add the rest of your scenarios here with their own status/message pairs.
+  {
+    label: 'too short',
+    id: 'abc123',
+    expectedStatus: 400,
+    expectedMessage: /Invalid base62 id/i,
+  },
+  {
+    label: 'too long',
+    id: '12345678901234567890123',
+    expectedStatus: 400,
+    expectedMessage: /Invalid base62 id/i,
+  },
+  {
+    label: 'illegal characters',
+    id: 'abc%24%25%5E%26*',
+    expectedStatus: 400,
+    expectedMessage: /Invalid base62 id/i,
+  },
+  {
+    label: 'full URL',
+    id: 'https%3A%2F%2Fopen.spotify.com%2Falbum%2F1ATL5GLyefJaxhQzSPVrLX',
+    expectedStatus: 400,
+    expectedMessage: /Invalid base62 id/i,
+  },
+  {
+    label: 'valid ID but with whitespace',
+    id: '21jF5jtzo94wbxmJ18aa ',
+    expectedStatus: 400,
+    expectedMessage: /Invalid base62 id/i,
+  }
 ];
 
 test.describe('Albums – GET /albums/{id}', () => {
@@ -44,19 +91,23 @@ test('returns album details for a valid album id', async ({ api }) => {
     expect(json.href).toMatch(/^https:\/\/api\.spotify\.com\/v1\/albums\//);
   });
 
-  test.describe('Albums – GET /albums/{id} – Invalid ID Format (400)', () => {
-  for (const badId of invalidAlbumIds) {
-    test(`returns 400 for invalid album id: "${badId}"`, async ({ api }) => {
-      const res = await api.get(`albums/${badId}`);
-      expect(res.status(), `Expected 400 for id: ${badId}`).toBe(400);
+  test.describe('Albums – GET /albums/{id} – invalid inputs', () => {
+  for (const { label, id, expectedStatus, expectedMessage } of invalidAlbumCases) {
+    test(`returns ${expectedStatus} when album id is ${label}`, async ({ api }) => {
+      const res = await api.get(`albums/${id}`);
+      expect(res.status(), 'HTTP status').toBe(expectedStatus);
 
-      
-      const json = await res.json();
-      expect(json).toHaveProperty('error');
-      expect(json.error.status).toBe(400);
-      expect(typeof json.error.message).toBe('string');
-      expect(json.error.message.toLowerCase()).toContain('missing required field: ids');
+      const body = await res.json();
+      expect(body).toHaveProperty('error');
+      expect(body.error.status, 'error.status').toBe(expectedStatus);
+
+      if (typeof expectedMessage === 'string') {
+        expect(body.error.message, 'error.message').toBe(expectedMessage);
+      } else {
+        expect(body.error.message, 'error.message').toMatch(expectedMessage);
+      }
     });
   }
 });
+
 });
