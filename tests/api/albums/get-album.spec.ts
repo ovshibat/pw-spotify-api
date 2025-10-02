@@ -106,13 +106,14 @@ test.describe('Albums – GET /albums/{id}', () => {
       expect(json).toHaveProperty('total_tracks');
       expect(json).toHaveProperty('id');
       expect(json).toHaveProperty('name');
+      expect(json).toHaveProperty('release_date');
 
       // allowed values for album_type
       const allowedAlbumTypes = ['album', 'single', 'compilation'];
       expect(allowedAlbumTypes).toContain(json.album_type);
 
-      // allowed 
-
+      // allowed values for release_date
+      expect(json.release_date).toMatch(/^\d{4}(-\d{2}(-\d{2})?)?$/);
     })
   })
 
